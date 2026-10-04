@@ -7,8 +7,8 @@
 
 ## Возможности
 
-- SQL: 18 заданий, SQLite (sql.js / WebAssembly), проверка результата, подсказки и справочник.
-- BPMN: 8 сценариев, редактор bpmn-js, проверка структуры и экспорт `.bpmn`.
+- SQL: 26 заданий, SQLite (sql.js / WebAssembly), проверка результата, подсказки и справочник.
+- BPMN: 12 сценариев, редактор bpmn-js, проверка структуры и экспорт `.bpmn`.
 - API: 6 заданий, GET/POST/PUT/PATCH/DELETE, локальная песочница, собственные эндпоинты и экспорт OpenAPI 3.0.3.
 - Адаптивный интерфейс и локальное сохранение прогресса.
 
@@ -31,6 +31,7 @@ API-песочница использует Service Worker: требуется H
 ```sh
 node tests/bpmn-validation.cjs
 node tests/api-runtime.cjs
+node tests/sql-advanced.cjs
 ```
 
 ## Структура
