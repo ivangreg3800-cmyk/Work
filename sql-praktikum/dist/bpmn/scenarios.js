@@ -491,9 +491,365 @@ scenarios.push(...[
     "rules": "Один процесс без пулов и дорожек. Используйте указанные названия задач, шлюзов и конечных событий. Подпишите условные ветки «Да» / «Нет». Начальное событие можно назвать произвольно."
   }
 ]);
+scenarios.push(...[
+  {
+    "id": "lanes-purchase",
+    "title": "Закупка: три ответственные роли",
+    "area": "Закупки",
+    "pool": "Закупка",
+    "lanes": [
+      "Инициатор",
+      "Закупщик",
+      "Бухгалтер"
+    ],
+    "story": "Внутри компании инициатор создаёт заявку на закупку. Закупщик выбирает поставщика и получает счёт. Бухгалтер проверяет счёт, затем оплачивает его. После оплаты закупщик оформляет заказ. Процесс завершается у закупщика. Нарисуйте один пул «Закупка» с тремя дорожками: «Инициатор», «Закупщик», «Бухгалтер». Между дорожками передаётся управление в рамках одного процесса.",
+    "hint": "Создайте три дорожки внутри одного пула. Поток управления может пересекать границы дорожек; поток сообщений здесь не нужен.",
+    "graph": {
+      "nodes": [
+        {
+          "id": "s",
+          "type": "start",
+          "name": "Начало",
+          "lane": "Инициатор"
+        },
+        {
+          "id": "request",
+          "type": "task",
+          "name": "Создать заявку",
+          "lane": "Инициатор"
+        },
+        {
+          "id": "supplier",
+          "type": "task",
+          "name": "Выбрать поставщика",
+          "lane": "Закупщик"
+        },
+        {
+          "id": "invoice",
+          "type": "task",
+          "name": "Получить счёт",
+          "lane": "Закупщик"
+        },
+        {
+          "id": "check",
+          "type": "task",
+          "name": "Проверить счёт",
+          "lane": "Бухгалтер"
+        },
+        {
+          "id": "pay",
+          "type": "task",
+          "name": "Оплатить счёт",
+          "lane": "Бухгалтер"
+        },
+        {
+          "id": "order",
+          "type": "task",
+          "name": "Оформить заказ",
+          "lane": "Закупщик"
+        },
+        {
+          "id": "e",
+          "type": "end",
+          "name": "Заказ оформлен",
+          "lane": "Закупщик"
+        }
+      ],
+      "edges": [
+        [
+          "s",
+          "request"
+        ],
+        [
+          "request",
+          "supplier"
+        ],
+        [
+          "supplier",
+          "invoice"
+        ],
+        [
+          "invoice",
+          "check"
+        ],
+        [
+          "check",
+          "pay"
+        ],
+        [
+          "pay",
+          "order"
+        ],
+        [
+          "order",
+          "e"
+        ]
+      ]
+    },
+    "pattern": "graph",
+    "level": "Дорожки",
+    "tasks": [
+      "Создать заявку",
+      "Выбрать поставщика",
+      "Получить счёт",
+      "Проверить счёт",
+      "Оплатить счёт",
+      "Оформить заказ"
+    ],
+    "rules": "Создайте указанные дорожки внутри одного пула. Назовите задачи, шлюзы и конечные события по списку. Распределите все события и действия по ролям из условия; соединяйте их потоками управления."
+  },
+  {
+    "id": "lanes-vacation",
+    "title": "Отпуск: решение и передача ответственности",
+    "area": "Кадровый процесс",
+    "pool": "Отпуск",
+    "lanes": [
+      "Сотрудник",
+      "Руководитель",
+      "Кадровик"
+    ],
+    "story": "Сотрудник подаёт заявление на отпуск. Руководитель рассматривает его и решает, согласовать ли отпуск. При согласовании кадровик оформляет приказ, после чего сотрудник получает подтверждение и завершает процесс. При отказе руководитель отправляет отказ, и процесс завершается в его дорожке. Используйте один пул «Отпуск» с дорожками «Сотрудник», «Руководитель», «Кадровик». Шлюз решения принадлежит руководителю.",
+    "hint": "XOR-развилка размещается у руководителя. «Да» ведёт к кадровику, «Нет» — к отправке отказа у руководителя. Успешный конец находится у сотрудника.",
+    "graph": {
+      "nodes": [
+        {
+          "id": "s",
+          "type": "start",
+          "name": "Начало",
+          "lane": "Сотрудник"
+        },
+        {
+          "id": "apply",
+          "type": "task",
+          "name": "Подать заявление",
+          "lane": "Сотрудник"
+        },
+        {
+          "id": "review",
+          "type": "task",
+          "name": "Рассмотреть заявление",
+          "lane": "Руководитель"
+        },
+        {
+          "id": "g",
+          "type": "xor",
+          "name": "Отпуск согласован?",
+          "lane": "Руководитель"
+        },
+        {
+          "id": "order",
+          "type": "task",
+          "name": "Оформить приказ",
+          "lane": "Кадровик"
+        },
+        {
+          "id": "confirm",
+          "type": "task",
+          "name": "Получить подтверждение",
+          "lane": "Сотрудник"
+        },
+        {
+          "id": "reject",
+          "type": "task",
+          "name": "Отправить отказ",
+          "lane": "Руководитель"
+        },
+        {
+          "id": "yes",
+          "type": "end",
+          "name": "Отпуск оформлен",
+          "lane": "Сотрудник"
+        },
+        {
+          "id": "no",
+          "type": "end",
+          "name": "Отказ отправлен",
+          "lane": "Руководитель"
+        }
+      ],
+      "edges": [
+        [
+          "s",
+          "apply"
+        ],
+        [
+          "apply",
+          "review"
+        ],
+        [
+          "review",
+          "g"
+        ],
+        [
+          "g",
+          "order",
+          "Да"
+        ],
+        [
+          "order",
+          "confirm"
+        ],
+        [
+          "confirm",
+          "yes"
+        ],
+        [
+          "g",
+          "reject",
+          "Нет"
+        ],
+        [
+          "reject",
+          "no"
+        ]
+      ]
+    },
+    "pattern": "graph",
+    "level": "Дорожки",
+    "tasks": [
+      "Подать заявление",
+      "Рассмотреть заявление",
+      "Оформить приказ",
+      "Получить подтверждение",
+      "Отправить отказ"
+    ],
+    "rules": "Создайте указанные дорожки внутри одного пула. Назовите задачи, шлюзы и конечные события по списку. Распределите все события и действия по ролям из условия; соединяйте их потоками управления."
+  },
+  {
+    "id": "lanes-onboarding",
+    "title": "Адаптация: параллельная работа четырёх команд",
+    "area": "HR и IT",
+    "pool": "Адаптация",
+    "lanes": [
+      "HR",
+      "IT",
+      "Офис-менеджер",
+      "Руководитель"
+    ],
+    "story": "HR регистрирует сотрудника и запускает параллельную подготовку: IT создаёт учётную запись и затем выдаёт доступы; офис-менеджер готовит рабочее место. Руководитель ждёт завершения обеих веток и проводит вводную встречу. После встречи HR закрывает адаптацию, и процесс завершается в дорожке HR. Используйте один пул «Адаптация» и четыре дорожки: HR, IT, Офис-менеджер, Руководитель. AND-разделение находится у HR, AND-синхронизация — у руководителя.",
+    "hint": "Параллельная ветка IT содержит две последовательные задачи. Руководитель должен ждать выдачи доступов и готовности рабочего места, а не только создания учётной записи.",
+    "graph": {
+      "nodes": [
+        {
+          "id": "s",
+          "type": "start",
+          "name": "Начало",
+          "lane": "HR"
+        },
+        {
+          "id": "register",
+          "type": "task",
+          "name": "Зарегистрировать сотрудника",
+          "lane": "HR"
+        },
+        {
+          "id": "split",
+          "type": "and",
+          "name": "Запуск подготовки",
+          "lane": "HR"
+        },
+        {
+          "id": "account",
+          "type": "task",
+          "name": "Создать учётную запись",
+          "lane": "IT"
+        },
+        {
+          "id": "access",
+          "type": "task",
+          "name": "Выдать доступы",
+          "lane": "IT"
+        },
+        {
+          "id": "desk",
+          "type": "task",
+          "name": "Подготовить рабочее место",
+          "lane": "Офис-менеджер"
+        },
+        {
+          "id": "join",
+          "type": "and",
+          "name": "Подготовка завершена",
+          "lane": "Руководитель"
+        },
+        {
+          "id": "meeting",
+          "type": "task",
+          "name": "Провести встречу",
+          "lane": "Руководитель"
+        },
+        {
+          "id": "close",
+          "type": "task",
+          "name": "Закрыть адаптацию",
+          "lane": "HR"
+        },
+        {
+          "id": "e",
+          "type": "end",
+          "name": "Адаптация закрыта",
+          "lane": "HR"
+        }
+      ],
+      "edges": [
+        [
+          "s",
+          "register"
+        ],
+        [
+          "register",
+          "split"
+        ],
+        [
+          "split",
+          "account"
+        ],
+        [
+          "account",
+          "access"
+        ],
+        [
+          "split",
+          "desk"
+        ],
+        [
+          "access",
+          "join"
+        ],
+        [
+          "desk",
+          "join"
+        ],
+        [
+          "join",
+          "meeting"
+        ],
+        [
+          "meeting",
+          "close"
+        ],
+        [
+          "close",
+          "e"
+        ]
+      ]
+    },
+    "pattern": "graph",
+    "level": "Дорожки",
+    "tasks": [
+      "Зарегистрировать сотрудника",
+      "Создать учётную запись",
+      "Выдать доступы",
+      "Подготовить рабочее место",
+      "Провести встречу",
+      "Закрыть адаптацию"
+    ],
+    "rules": "Создайте указанные дорожки внутри одного пула. Назовите задачи, шлюзы и конечные события по списку. Распределите все события и действия по ролям из условия; соединяйте их потоками управления."
+  }
+]);
 const normalize=s=>String(s||'').toLowerCase().replace(/ё/g,'е').replace(/[\s.,!?;:]+/g,' ').trim();
-function validateDiagram(nodes,flows,s){
- if(s.pattern==='graph')return validateGraph(nodes,flows,s);
+function validateDiagram(nodes,flows,s,layout={}){
+ if(s.pattern==='graph')return validateGraph(nodes,flows,s,layout);
  const checks=[];const add=(label,pass)=>checks.push({label,pass:!!pass});
  const starts=nodes.filter(n=>n.type==='start'),ends=nodes.filter(n=>n.type==='end'),activities=nodes.filter(n=>n.type==='task'),gateways=nodes.filter(n=>['xor','and'].includes(n.type));
  const incoming=n=>flows.filter(f=>f.target===n?.id),outgoing=n=>flows.filter(f=>f.source===n?.id),edge=(a,b)=>!!a&&!!b&&flows.some(f=>f.source===a.id&&f.target===b.id);
@@ -522,7 +878,7 @@ function validateDiagram(nodes,flows,s){
  return {checks,passed:checks.every(c=>c.pass)};
 }
 
-function validateGraph(nodes,flows,s){
+function validateGraph(nodes,flows,s,layout={}){
  const checks=[],mapping=new Map();
  for(const expected of s.graph.nodes){
   const matches=nodes.filter(n=>n.type===expected.type&&(expected.type==='start'||normalize(n.name)===normalize(expected.name)));
@@ -530,6 +886,18 @@ function validateGraph(nodes,flows,s){
   if(matches.length===1)mapping.set(expected.id,matches[0].id);
  }
  checks.push({label:'Нет лишних или неподдерживаемых элементов',pass:nodes.length===s.graph.nodes.length&&mapping.size===s.graph.nodes.length&&new Set(mapping.values()).size===nodes.length});
+
+ if(s.lanes){
+  const lanes=layout.lanes||[],pools=layout.pools||[];
+  checks.push({label:'Один пул «'+s.pool+'»',pass:pools.length===1&&normalize(pools[0].name)===normalize(s.pool)});
+  checks.push({label:'Все требуемые дорожки внутри этого пула',pass:lanes.length===s.lanes.length&&s.lanes.every(name=>lanes.filter(l=>normalize(l.name)===normalize(name)&&l.poolId===pools[0]?.id).length===1)&&lanes.every(l=>l.topLevel)});
+  for(const expected of s.graph.nodes){
+   const actual=nodes.find(n=>n.id===mapping.get(expected.id));
+   const lane=lanes.find(l=>normalize(l.name)===normalize(expected.lane));
+   checks.push({label:expected.name+' — дорожка «'+expected.lane+'»',pass:!!actual&&!!lane&&actual.poolId===pools[0]?.id&&Array.isArray(actual.laneIds)&&actual.laneIds.length===1&&actual.laneIds[0]===lane.id&&actual.insideLane===true});
+  }
+ }
+
  const required=s.graph.edges;
  for(const expected of s.graph.nodes){
   const targetEdges=required.filter(e=>e[0]===expected.id);

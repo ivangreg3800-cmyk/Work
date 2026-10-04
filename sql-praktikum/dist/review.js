@@ -1,0 +1,5 @@
+(function(root){
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(r){if(!r)return '<p>Разбор пока не подготовлен.</p>';return '<div class="review-content">'+(r.goal?'<h3>Идея решения</h3><p>'+esc(r.goal)+'</p>':'')+'<h3>Шаг за шагом</h3><ol>'+r.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>'+(r.code?'<h3>Пример решения</h3><pre>'+esc(r.code)+'</pre>':'')+(r.rows?'<h3>'+esc(r.tableTitle||'Схема решения')+'</h3><div class="review-table"><table><thead><tr>'+r.headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+r.rows.map(row=>'<tr>'+row.map(v=>'<td>'+esc(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>':'')+(r.expected?'<h3>Как проверить себя</h3><p>'+esc(r.expected)+'</p>':'')+'<h3>Типичные ошибки</h3><ul>'+r.mistakes.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul><p class="review-note">Просмотр разбора не засчитывает задание. Решение проверяется отдельно.</p></div>'}
+root.PracticeReview={render,esc};if(typeof module!=='undefined')module.exports=root.PracticeReview;
+})(typeof window==='undefined'?globalThis:window);
