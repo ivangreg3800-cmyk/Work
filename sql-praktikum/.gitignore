@@ -1,7 +1,4 @@
-.DS_Store
+dist/
 .env
 .env.*
-node_modules/
-.openai/
-.sites-runtime/
-*.tar.gz
+!.env.example

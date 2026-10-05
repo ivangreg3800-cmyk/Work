@@ -1,0 +1,5 @@
+const fs=require('node:fs'),path=require('node:path');
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.wasm':'application/wasm','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf','.json':'application/json','.png':'image/png'};
+const assets={};function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory())walk(p);else if(e.isFile()){const relative=path.relative('public',p).split(path.sep).join('/');assets['/'+relative]={data:fs.readFileSync(p).toString('base64'),type:types[path.extname(p)]||'application/octet-stream'}}}}
+walk('public');fs.mkdirSync('dist/server',{recursive:true});fs.writeFileSync('dist/server/index.js',fs.readFileSync('server/auth.mjs','utf8')+'\nconst assets='+JSON.stringify(assets)+';\nexport default createApp(assets);\n');
+console.log('Built authenticated Worker with '+Object.keys(assets).length+' protected assets.');
