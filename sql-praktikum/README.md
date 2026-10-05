@@ -1,4 +1,4 @@
-# ВерПрактикум SQL · BPMN · API
+# ВерПрактикум SQL · BPMN · API · Python
 
 Интерактивный учебный сайт на русском языке.
 
@@ -11,6 +11,7 @@
 - BPMN: 15 сценариев, включая три процесса с 3–4 дорожками, редактор bpmn-js, проверка структуры и экспорт `.bpmn`.
 - API: 12 заданий, включая пагинацию, идемпотентность, ETag/If-Match, роли и цепочки запросов, GET/POST/PUT/PATCH/DELETE, локальная песочница, собственные эндпоинты и экспорт OpenAPI 3.0.3.
 - Подробный разбор каждого задания SQL, BPMN и API: шаги, эталонный подход и типичные ошибки.
+- Python: 12 заданий (основы, практика и алгоритмы), теория, код в Web Worker с Pyodide 0.29.3, автоматические тесты и подробные разборы. При первом запуске необходим доступ к cdn.jsdelivr.net; внешние пакеты для заданий не нужны. Проверяется возвращаемый результат, а не конкретный алгоритм.
 - Адаптивный интерфейс и локальное сохранение прогресса.
 
 ## Локальный запуск
@@ -35,7 +36,10 @@ node tests/api-runtime.cjs
 node tests/api-advanced.cjs
 node tests/sql-advanced.cjs
 node tests/auth.mjs
+node tests/python-ui.cjs
 ```
+
+Проверка всех 58 Python-кейсов в настоящем Pyodide: скачайте полный runtime версии 0.29.3 и выполните `PYODIDE_RUNTIME=/path/to/runtime node tests/python-runtime.cjs`.
 
 ## Структура
 
@@ -43,6 +47,7 @@ node tests/auth.mjs
 - `server/auth.mjs` — общий вход, серверная проверка и подписанная сессия.
 - `scripts/build-auth.cjs` — сборка Worker в `dist/server/index.js`.
 - `public/bpmn/` — BPMN-тренажёр и правила проверки.
+- `public/python/` — обучение Python, задания и изолированный от интерфейса поток исполнения.
 - `public/api/` — API-тренажёр и Service Worker.
 - `public/login/` — страница входа.
 - `public/vendor/` — локальные зависимости.
