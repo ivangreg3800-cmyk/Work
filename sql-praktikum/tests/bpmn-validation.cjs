@@ -4,3 +4,22 @@ for(const s of scenarios){const f=fixture(s);assert.equal(validateDiagram(f.node
 console.log('All correct diagrams pass; missing edges, wrong labels, orphan nodes, renamed tasks and incorrect gateways fail.');
 
 for(const s of scenarios.filter(s=>s.lanes)){for(const mutation of [f=>f.nodes[1].laneIds=['wrong'],f=>f.nodes[1].insideLane=false,f=>f.pools[0].name='wrong',f=>f.lanes.pop(),f=>f.lanes[0].topLevel=false]){const f=fixture(s);mutation(f);assert.equal(validateDiagram(f.nodes,f.flows,s,f).passed,false,'Incorrect lane layout must fail')}}
+
+const {forScenario}=require('../public/bpmn/reviews.js');
+const added=scenarios.filter(s=>s.reviewSteps);
+assert.equal(added.length,12);
+assert.equal(new Set(scenarios.map(s=>s.id)).size,scenarios.length);
+for(const level of ['Средний','Продвинутый','Экспертный'])assert.equal(added.filter(s=>s.level===level).length,4);
+for(const s of added){
+ const {nodes,edges}=s.graph,ids=new Set(nodes.map(n=>n.id));assert.equal(ids.size,nodes.length,s.id);
+ assert(edges.every(([a,b])=>ids.has(a)&&ids.has(b)),s.id);
+ const walk=(seeds,reverse=false)=>{const visited=new Set(seeds),queue=[...seeds];while(queue.length){const id=queue.shift();for(const [a,b] of edges){const from=reverse?b:a,to=reverse?a:b;if(from===id&&!visited.has(to)){visited.add(to);queue.push(to)}}}return visited};
+ const forward=walk(nodes.filter(n=>n.type==='start').map(n=>n.id)),backward=walk(nodes.filter(n=>n.type==='end').map(n=>n.id),true);
+ assert(nodes.every(n=>forward.has(n.id)&&backward.has(n.id)),s.id+' reachability');
+ for(const n of nodes.filter(n=>['xor','and'].includes(n.type))){const incoming=edges.filter(e=>e[1]===n.id),outgoing=edges.filter(e=>e[0]===n.id);assert((incoming.length===1&&outgoing.length>=2)||(incoming.length>=2&&outgoing.length===1),s.id+' gateway shape');if(n.type==='xor'&&outgoing.length>1)assert.deepEqual(outgoing.map(e=>e[2]).sort(),['Да','Нет']);if(n.type==='and')assert(outgoing.every(e=>!e[2]));}
+ if(s.lanes)assert(nodes.every(n=>s.lanes.includes(n.lane)));
+ const review=forScenario(s);assert.equal(review.rows.length,edges.length);for(const step of s.reviewSteps)assert(review.steps.includes(step));for(const mistake of s.reviewMistakes)assert(review.mistakes.includes(mistake));
+}
+// Reject a broken retry loop and bypass of one branch of a three-way AND join.
+for(const [id,source,newTarget] of [['advanced-contract-rework','fix','g'],['expert-parallel-rework','fix','legal'],['advanced-procurement','security','collect']]){const s=scenarios.find(s=>s.id===id),f=fixture(s);f.flows.find(e=>e.source===source).target=newTarget;assert.equal(validateDiagram(f.nodes,f.flows,s,f).passed,false,id+' broken control flow');}
+console.log('PASS: 12 new scenarios, balanced gateway structure, reachability, detailed reviews, lane assignments and broken loop/synchronisation rejection.');
